@@ -5,16 +5,19 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"strings"
 	redis "github.com/redis/go-redis/v9"
 )
 
 type URLService struct {
 	redisClient *redis.Client
+	baseURL     string
 }
 
-func NewURLService(redisClient *redis.Client) *URLService {
+func NewURLService(redisClient *redis.Client, baseURL string) *URLService {
 	return &URLService{
 		redisClient: redisClient,
+		baseURL:     baseURL,
 	}
 }
 
@@ -36,8 +39,8 @@ func (s *URLService) ShortenURL(longURL string) (string, error) {
 		return "", fmt.Errorf("failed to store URL in Redis: %w", err)
 	}
 
-	// Return the full short URL path
-	return fmt.Sprintf("short.url/%s", shortCode), nil
+	// Return a fully qualified short URL built from config.
+	return fmt.Sprintf("%s/%s", strings.TrimRight(s.baseURL, "/"), shortCode), nil
 }
 
 func (s *URLService) GetLongURL(ctx context.Context, shortURL string) (string, error) {

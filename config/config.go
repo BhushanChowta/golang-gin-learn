@@ -9,11 +9,11 @@ type RedisClient struct {
 	Client *redis.Client
 }
 
-func NewRedisClient() *RedisClient {
+func NewRedisClient(cfg *AppConfig) *RedisClient {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     cfg.RedisAddr,
+		Password: cfg.RedisPassword,
+		DB:       cfg.RedisDB,
 	})
 
 	_, err := client.Ping(context.Background()).Result() // Test connection

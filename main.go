@@ -14,11 +14,13 @@ type POSTURLRequest struct {
 }
 
 func main() {
+	cfg := config.LoadEnv()
+
   // Create a Gin router with default middleware (logger and recovery)
   r := gin.Default()
 
-  rdb := config.NewRedisClient()
-  urlService := service.NewURLService(rdb.Client)
+  rdb := config.NewRedisClient(cfg)
+  urlService := service.NewURLService(rdb.Client, cfg.BaseURL)
 
   r.POST("/shorten", func(c *gin.Context) {
     var req POSTURLRequest
@@ -66,5 +68,5 @@ func main() {
 
   // Start server on port 8080 (default)
   // Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
-  r.Run()
+  r.Run(":" + cfg.ServerPort)
 }
